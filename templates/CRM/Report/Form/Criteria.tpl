@@ -25,7 +25,7 @@
 *}
 {* Report form criteria section *}
     {if $colGroups}
-      <div id="col-groups" class="civireport-criteria" >
+      <div id="col-groups" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom" >
         {if $componentName eq 'Grant'}
             <h3>{ts}Include these Statistics{/ts}</h3>
         {else}
@@ -35,9 +35,10 @@
             {assign  var="count" value="0"}
             {* Wrap custom field sets in collapsed accordion pane. *}
             {if $grpFields.group_title}
-                <div class="crm-accordion-wrapper crm-accordion collapsed">
+                <div class="crm-accordion-wrapper crm-accordion crm-accordion-closed">
                     <div class="crm-accordion-header">
-                                    {$grpFields.group_title}
+                       <div class="icon crm-accordion-pointer"></div>
+                       {$grpFields.group_title}
                     </div><!-- /.crm-accordion-header -->
                     <div class="crm-accordion-body">
             {/if}
@@ -64,7 +65,7 @@
     {/if}
 
     {if $groupByElements}
-        <div id="group-by-elements" class="civireport-criteria" >
+        <div id="group-by-elements" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>Group by Columns</h3>
         {assign  var="count" value="0"}
         <table class="report-layout">
@@ -90,7 +91,7 @@
     {/if}
 
     {if $orderByOptions}
-      <div id="order-by-elements" class="civireport-criteria" >
+      <div id="order-by-elements" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>Order by Columns</h3>
 
   <table id="optionField">
@@ -147,7 +148,7 @@
     {/if}
 
     {if $otherOptions}
-        <div id="other-options" class="civireport-criteria" >
+        <div id="other-options" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>Other Options</h3>
         <table class="report-layout">
           {assign var="optionCount" value=0}
@@ -168,7 +169,7 @@
     {/if}
 
     {if $filters}
-  <div id="set-filters" class="civireport-criteria" >
+  <div id="set-filters" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>Set Filters</h3>
         <table class="report-layout">
       {assign var="counter" value=1}
@@ -181,9 +182,10 @@
                 </table>
       {assign var="counter" value=0}
         {/if}
-                    <div class="crm-accordion-wrapper crm-accordion collapsed">
+                    <div class="crm-accordion-wrapper crm-accordion crm-accordion-closed">
                     <div class="crm-accordion-header">
-                                    {$colGroups.$tableName.group_title}
+                        <div class="icon crm-accordion-pointer"></div>
+                        {$colGroups.$tableName.group_title}
                     </div><!-- /.crm-accordion-header -->
                     <div class="crm-accordion-body">
                     <table class="report-layout">
