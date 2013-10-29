@@ -26,49 +26,48 @@
 {if !$printOnly} {* NO print section starts *}
 {if $criteriaForm}
 <div class="crm-report-criteria"> {* criteria section starts *}
-  <div class="crm-accordion-wrapper crm-report_criteria-accordion crm-accordion_title-accordion {if $rows}crm-accordion-closed{else}crm-accordion-open{/if}">
+  <div class="crm-accordion-wrapper crm-report_criteria-accordion {if $rows}collapsed{/if}">
     <div class="crm-accordion-header">
-      <div class="icon crm-accordion-pointer"></div>
       {ts}Report Configuration{/ts}
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
-      <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+      <div id="mainTabContainer">
         {*tab navigation bar*}
-        <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+        <ul>
           {if $colGroups}
-            <li id="tab_col-groups" class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active">
+            <li id="tab_col-groups" class="crm-tab-button ui-corner-all">
               <a title="Columns" href="#col-groups">Columns</a>
             </li>
           {/if}
           {if $groupByElements}
-            <li id="tab_group-by-elements" class="ui-state-default ui-corner-top">
+            <li id="tab_group-by-elements" class="crm-tab-button ui-corner-all">
               <a title="Group By" href="#group-by-elements">Group By</a>
             </li>
           {/if}
           {if $orderByOptions}
-            <li id="tab_order-by-elements" class="ui-state-default ui-corner-top">
+            <li id="tab_order-by-elements" class="crm-tab-button ui-corner-all">
               <a title="Order By" href="#order-by-elements">Order By</a>
             </li>
           {/if}
           {if $form.options.html}
-            <li id="tab_other-options" class="ui-state-default ui-corner-top">
+            <li id="tab_other-options" class="crm-tab-button ui-corner-all">
               <a title="Other Options" href="#other-options">Options</a>
             </li>
           {/if}
           {if $filters}
-            <li id="tab_set-filters" class="ui-state-default ui-corner-top">
+            <li id="tab_set-filters" class="crm-tab-button ui-corner-all">
               <a title="Filters" href="#set-filters">Filters</a>
             </li>
           {/if}
           {if $instanceForm OR $instanceFormError}
-            <li id="tab_settings" class="ui-state-default ui-corner-top">
-              <a title="Settings" href="#settings">Settings</a>
+            <li id="tab_settings" class="crm-tab-button ui-corner-all">
+              <a title="Settings" href="#settings">General Settings</a>
             </li>
-            <li id="tab_email" class="ui-state-default ui-corner-top">
-              <a title="Email" href="#email">Email</a>
+            <li id="tab_email" class="crm-tab-button ui-corner-all">
+              <a title="Email" href="#email">Email Settings</a>
             </li>
-            <li id="tab_other" class="ui-state-default ui-corner-top">
-              <a title="Other" href="#other">Other</a>
+            <li id="tab_other" class="crm-tab-button ui-corner-all">
+              <a title="Other" href="#other">Other Settings</a>
             </li>
           {/if}
         </ul>
@@ -81,8 +80,8 @@
           {include file="CRM/Report/Form/Instance.tpl"}
         {/if}
       </div> {* end mainTabContainer *}
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </div> {* crm-accordion-body *}
+  </div> {* crm-accordion-wrapper *}
 </div> {* criteria section ends *}
 {/if}
 
@@ -109,7 +108,8 @@
 {literal}
 <script type="text/javascript">
 cj(function() {
-  cj().crmaccordions();
+  cj("#mainTabContainer").tabs()
+  cj().crmAccordions();
 });
 </script>
 {/literal}

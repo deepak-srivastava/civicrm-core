@@ -25,7 +25,8 @@
 *}
 {* Report form criteria section *}
     {if $colGroups}
-      <div id="col-groups" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom" >
+      <div id="col-groups">
+        <div class="crm-block crm-form-block crm-report-criteria-col-groups">
         {if $componentName eq 'Grant'}
             <h3>{ts}Include these Statistics{/ts}</h3>
         {else}
@@ -62,10 +63,12 @@
             {/if}
         {/foreach}
         </div>
+      </div>
     {/if}
 
     {if $groupByElements}
-        <div id="group-by-elements" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+        <div id="group-by-elements">
+        <div class="crm-block crm-form-block crm-report-criteria-group-by-elements">
         <h3>Group by Columns</h3>
         {assign  var="count" value="0"}
         <table class="report-layout">
@@ -88,10 +91,12 @@
             </tr>
         </table>
      </div>
+     </div>
     {/if}
 
     {if $orderByOptions}
-      <div id="order-by-elements" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+      <div id="order-by-elements">
+      <div class="crm-block crm-form-block crm-report-criteria-order-by-elements">
         <h3>Order by Columns</h3>
 
   <table id="optionField">
@@ -145,10 +150,12 @@
             {/literal}
         </script>
       </div>
+      </div>
     {/if}
 
     {if $otherOptions}
-        <div id="other-options" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+        <div id="other-options">
+        <div class="crm-block crm-form-block crm-report-criteria-other-options">
         <h3>Other Options</h3>
         <table class="report-layout">
           {assign var="optionCount" value=0}
@@ -166,10 +173,12 @@
           </tr>
         </table>
         </div>
+        </div>
     {/if}
 
     {if $filters}
-  <div id="set-filters" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+  <div id="set-filters">
+        <div class="crm-block crm-form-block crm-report-criteria-set-filters">
         <h3>Set Filters</h3>
         <table class="report-layout">
       {assign var="counter" value=1}
@@ -222,6 +231,7 @@
 
             {/foreach}
             {if $closed eq 0 }</table>{/if}
+        </div>
         </div>
     {/if}
 

@@ -23,7 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="settings" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+<div id="settings">
+<div class="crm-block crm-form-block crm-report-criteria-settings">
   <h3>{ts}General Settings{/ts}</h3>
   <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-title">
@@ -44,8 +45,10 @@
     </tr>
   </table>
 </div>
+</div>
 
-<div id="email" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+<div id="email">
+<div class="crm-block crm-form-block crm-report-criteria-email">
   <h3>{ts}Email Delivery Settings{/ts} {help id="id-email_settings" file="CRM/Report/Form/Settings.hlp"}</h3>
   <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-email_subject">
@@ -62,8 +65,10 @@
     </tr>
   </table>
 </div>
+</div>
 
-<div id="other" class="civireport-criteria ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+<div id="other">
+<div class="crm-block crm-form-block crm-report-criteria-other">
   <h3>{ts}Other Settings{/ts}</h3>
   <table class="form-layout">
     <tr class="crm-report-instanceForm-form-block-is_navigation">
@@ -103,6 +108,7 @@
       </td>
     </tr>
   </table>
+</div>
 </div>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
