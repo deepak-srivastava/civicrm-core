@@ -531,6 +531,30 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when sending an email / printing labels to get the values for all the
+   * tokens returned by the 'tokens' hook
+   *
+   * @param array  $details    - the array to store the token values indexed by contactIDs (unless it a single)
+   * @param array  $entityIDs  - an array of contactIDs if entity is 'Contact', an array of contributionIDs if entity is 'Contribution'..
+   * @param int    $jobID      - the jobID if this is associated with a CiviMail mailing
+   * @param array  $tokens     - the list of tokens associated with the content
+   * @param string $className  - the top level className from where the hook is invoked
+   * @param string $entity     - entity the processing is related to. Defaults to contact.
+   *
+   * @return null
+   * @access public
+   */
+  static function entityTokenValues(&$details,
+    $entityIDs,
+    $jobID     = NULL,
+    $tokens    = array(),
+    $className = NULL,
+    $entity    = 'Contact'
+  ) {
+    return self::singleton()->invoke(6, $details, $entityIDs, $jobID, $tokens, $className, $entity, 'civicrm_entityTokenValues');
+  }
+
+  /**
    * This hook is called before a CiviCRM Page is rendered. You can use this hook to insert smarty variables
    * in a  template
    *

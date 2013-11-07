@@ -719,9 +719,13 @@ class CRM_Utils_Token {
     &$contact,
     &$categories,
     $html = FALSE,
-    $escapeSmarty = FALSE
+    $escapeSmarty = FALSE,
+    $onlyIfCategoryHasKey = FALSE
   ) {
     foreach ($categories as $key) {
+      if ($onlyIfCategoryHasKey && !array_key_exists($key, $contact)) {
+	continue;
+      }
       $str = preg_replace_callback(
         self::tokenRegex($key),
         function ($matches) use(&$contact, $key, $html, $escapeSmarty) {
@@ -1201,6 +1205,15 @@ class CRM_Utils_Token {
         // TODO: call a hook to get token contribution details
       }
     }
+
+    // also call a hook and get token details
+    CRM_Utils_Hook::entityTokenValues($details,
+      $contributionIDs,
+      NULL,
+      $tokens,
+      $className,
+      'Contribution'
+    );
 
     return $details;
   }
