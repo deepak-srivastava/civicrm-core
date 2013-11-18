@@ -206,7 +206,7 @@
               buildSelect("start_action_date");
         buildSelect("end_date");
         buildSelect1("recipient");
-         });
+         }){/literal}{if $action eq 1}.change(){/if}{literal};//make entity_3 not render for add action
      });
 
     cj(function() {
