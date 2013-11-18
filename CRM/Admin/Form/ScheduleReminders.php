@@ -404,7 +404,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     foreach (array(
       'entity_value', 'entity_status', 'entity_filter') as $key) {
       if (!empty($$key)) {
-	$params[$key] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $$key);
+        $params[$key] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $$key);
       }
     }
 

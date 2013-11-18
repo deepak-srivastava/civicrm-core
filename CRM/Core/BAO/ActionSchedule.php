@@ -86,6 +86,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstrument  = CRM_Contribute_PseudoConstant::paymentInstrument();
+    $financialType      = CRM_Contribute_PseudoConstant::financialType();
 
     asort($activityType);
 
@@ -144,6 +145,13 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             $sel1Val = ts('Contribution');
           }
           $sel2[$key] = $valueLabel + $paymentInstrument;
+          break;
+
+        case 'financial_type_id':
+          if ($value['entity'] == 'civicrm_contribution') {
+            $sel1Val = ts('Contribution');
+          }
+          $sel2[$key] = $valueLabel + $financialType;
           break;
 
         case 'civicrm_membership_type':
@@ -325,8 +333,9 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $auto_renew_options = CRM_Core_PseudoConstant::autoRenew();
     $civicrm_membership_type = CRM_Member_PseudoConstant::membershipType();
 
-    $payment_instrument_id = CRM_Contribute_PseudoConstant::paymentInstrument();
+    $payment_instrument_id  = CRM_Contribute_PseudoConstant::paymentInstrument();
     $contribution_status_id = CRM_Contribute_PseudoConstant::contributionStatus();
+    $financial_type_id      = CRM_Contribute_PseudoConstant::financialType();
 
     asort($activity_type);
     $entity = array(
