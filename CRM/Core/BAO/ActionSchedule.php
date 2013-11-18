@@ -84,9 +84,12 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $autoRenew = CRM_Core_PseudoConstant::autoRenew();
     $membershipType = CRM_Member_PseudoConstant::membershipType();
 
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $paymentInstrument  = CRM_Contribute_PseudoConstant::paymentInstrument();
+
     asort($activityType);
 
-    $sel1 = $sel2 = $sel3 = $sel4 = $sel5 = array();
+    $sel1 = $sel2 = $sel3 = $sel4 = $col4 = $sel5 = array();
     $options = array('manual' => ts('Choose Recipient(s)'),
                'group' => ts('Select a Group'),
     );
@@ -134,6 +137,13 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             $sel1Val = ts('Event Name');
           }
           $sel2[$key] = $valueLabel + $event;
+          break;
+
+        case 'payment_instrument_id':
+          if ($value['entity'] == 'civicrm_contribution') {
+            $sel1Val = ts('Contribution');
+          }
+          $sel2[$key] = $valueLabel + $paymentInstrument;
           break;
 
         case 'civicrm_membership_type':
@@ -186,6 +196,12 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
           }
           break;
 
+        case 'contribution_status_id':
+          foreach ($sel3[$id] as $kkey => & $vval) {
+            $vval = $statusLabel + $contributionStatus;
+          }
+          break;
+
         case 'civicrm_participant_status_type':
           foreach ($sel3[$id] as $kkey => & $vval) {
             $vval = $statusLabel + $participantStatus;
@@ -214,12 +230,29 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
       }
     }
 
+    foreach ($mapping as $value) {
+      $entityFilter = CRM_Utils_Array::value('entity_filter', $value);
+      $id           = CRM_Utils_Array::value('id', $value);
+      $col4[$id]    = $sel3[$id];
+
+      switch ($value['entity']) {
+      case 'civicrm_contribution':
+	foreach ($col4[$id] as $kkey => & $vval) {
+	  foreach ($vval as $nkey => & $nval) {
+	    $nval = array('- campaign -') + CRM_Campaign_BAO_Campaign::getCampaigns();
+	  }
+	}
+	break;
+      }
+    }
+
     return array(
       'sel1' => $sel1,
       'sel2' => $sel2,
       'sel3' => $sel3,
       'sel4' => $sel4,
       'sel5' => $sel5,
+      'col4' => $col4,
       'entityMapping' => $entityMapping,
       'recipientMapping' => $recipientMapping,
     );
@@ -292,11 +325,15 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $auto_renew_options = CRM_Core_PseudoConstant::autoRenew();
     $civicrm_membership_type = CRM_Member_PseudoConstant::membershipType();
 
+    $payment_instrument_id = CRM_Contribute_PseudoConstant::paymentInstrument();
+    $contribution_status_id = CRM_Contribute_PseudoConstant::contributionStatus();
+
     asort($activity_type);
     $entity = array(
       'civicrm_activity' => 'Activity',
       'civicrm_participant' => 'Event',
       'civicrm_membership' => 'Member',
+      'civicrm_contribution' => 'Contributor',
     );
 
     $query = "
@@ -744,6 +781,14 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       );
       $status = implode(',', $status);
 
+      $filter = NULL;
+      if (!empty($actionSchedule->entity_filter)) {
+	$filter = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+	  trim($actionSchedule->entity_filter, CRM_Core_DAO::VALUE_SEPARATOR)
+	);
+	$filter = implode(',', $filter);
+      }
+
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
         $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient);
       }
@@ -848,6 +893,24 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $mStatus = implode (',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
 
+      }
+
+      if ($mapping->entity == 'civicrm_contribution') {
+        $contactField = 'e.contact_id';
+
+        if (!empty($value)) {
+          $where[] = "e.{$mapping->entity_value} IN ({$value})";
+        }
+
+        if (!empty($status)) {
+          $where[] = "e.{$mapping->entity_status} IN ({$status})";
+        }
+
+        if (!empty($filter)) {
+          $where[] = "e.{$mapping->entity_filter} IN ({$filter})";
+        }
+
+        $dateField = str_replace('contribution_', 'e.', $actionSchedule->start_action_date);
       }
 
       if ($actionSchedule->group_id) {
