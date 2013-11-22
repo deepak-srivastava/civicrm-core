@@ -563,23 +563,16 @@ WHERE   cas.entity_value = $id AND
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_ActionSchedule', $id, 'is_active', $is_active);
   }
 
-  static function sendMailings($mappingID, $now) {
-    $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-    $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
-
-    $mapping = new CRM_Core_DAO_ActionMapping();
-    $mapping->id = $mappingID;
-    $mapping->find(TRUE);
-
-    $actionSchedule = new CRM_Core_DAO_ActionSchedule();
-    $actionSchedule->mapping_id = $mappingID;
-    $actionSchedule->is_active = 1;
-    $actionSchedule->find(FALSE);
-
-    $tokenFields = array();
-    $session = CRM_Core_Session::singleton();
-
-    while ($actionSchedule->fetch()) {
+  static function getMailingsQuery($actionScheduleID) {
+      $actionSchedule = new CRM_Core_DAO_ActionSchedule();
+      $actionSchedule->id = $actionScheduleID;
+      if ($actionSchedule->find(TRUE)) {
+	$mapping = new CRM_Core_DAO_ActionMapping();
+	$mapping->id = $actionSchedule->mapping_id;
+	$mapping->find(TRUE);
+      } else {
+	CRM_Core_Error::fatal('Can\'t find action schedule record.');
+      }
       $extraSelect = $extraJoin = $extraWhere = '';
 
       if ($actionSchedule->record_activity) {
@@ -637,6 +630,52 @@ INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id
 {$extraJoin}
 WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 {$extraWhere}";
+
+      return $query;
+  }
+
+  static function getMailingsCount($actionScheduleID) {
+    $actionSchedule = new CRM_Core_DAO_ActionSchedule();
+    $actionSchedule->id = $actionScheduleID;
+    $actionSchedule->find(TRUE);
+
+    // fill action log table
+    $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
+    self::buildRecipientContacts($actionSchedule->mapping_id, $now, FALSE);
+
+    $query = self::getMailingsQuery($actionSchedule->id);
+    $query = str_replace('SELECT ', 'SELECT SQL_CALC_FOUND_ROWS ', $query);
+
+    CRM_Core_DAO::executeQuery($query,
+      array(1 => array($actionSchedule->id, 'Integer'))
+    );
+
+    $count = CRM_Core_DAO::singleValueQuery("SELECT FOUND_ROWS()");
+
+    // lets delete logs that we generated for in-active reminders
+    $query = "DELETE log.*
+FROM civicrm_action_log log
+INNER JOIN civicrm_action_schedule sh ON sh.id = log.action_schedule_id
+WHERE sh.is_active=0 AND log.action_date_time IS NULL AND log.is_error=0 AND log.message IS NULL AND log.repetition_number IS NULL";
+    CRM_Core_DAO::executeQuery($query);
+
+    return $count;
+  }
+
+  static function sendMailings($mappingID, $now) {
+    $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
+    $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
+
+    $actionSchedule = new CRM_Core_DAO_ActionSchedule();
+    $actionSchedule->mapping_id = $mappingID;
+    $actionSchedule->is_active = 1;
+    $actionSchedule->find(FALSE);
+
+    $tokenFields = array();
+    $session = CRM_Core_Session::singleton();
+
+    while ($actionSchedule->fetch()) {
+      $query = self::getMailingsQuery($actionSchedule->id);
 
       $dao = CRM_Core_DAO::executeQuery($query,
              array(1 => array($actionSchedule->id, 'Integer'))
@@ -721,10 +760,10 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     }
   }
 
-  static function buildRecipientContacts($mappingID, $now) {
+  static function buildRecipientContacts($mappingID, $now, $isActive = TRUE) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->mapping_id = $mappingID;
-    $actionSchedule->is_active = 1;
+    $actionSchedule->is_active = (bool) $isActive;
     $actionSchedule->find();
 
     while ($actionSchedule->fetch()) {
