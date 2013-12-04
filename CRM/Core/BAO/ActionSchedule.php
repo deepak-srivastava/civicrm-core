@@ -676,6 +676,12 @@ LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
  INNER JOIN civicrm_membership_status ms ON e.status_id = ms.id';
       }
 
+      if ($mapping->entity == 'civicrm_contribution') {
+        $tokenEntity = 'contribution';
+        $tokenFields = array('receive_date', 'id', 'total_amount', 'fee_amount', 'trxn_id', 'invoice_id', 'source', 'check_number', 'campaign_id');
+        $extraSelect = ', e.receive_date, e.id as id , e.total_amount, e.fee_amount, e.trxn_id, e.invoice_id, e.source, e.check_number, e.campaign_id';
+      }
+
       $query = "
 SELECT reminder.id as reminderID, reminder.*, e.id as entityID, e.* {$extraSelect}
 FROM  civicrm_action_log reminder
