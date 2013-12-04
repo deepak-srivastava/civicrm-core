@@ -413,22 +413,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'search':
-        $extraParams = "reset=1";
-        if ($qfKey) {
-          $extraParams .= "&qfKey=$qfKey";
-        }
-
-        $this->assign('searchKey', $qfKey);
-        if ($context == 'advanced') {
-          $url = CRM_Utils_System::url('civicrm/contact/search/advanced', $extraParams);
-        }
-        else {
-          $url = CRM_Utils_System::url('civicrm/contribute/search', $extraParams);
-        }
-        break;
-
       case 'advanced':
-        $extraParams = "force=1";
+        $extraParams = "reset=1";
         if ($qfKey) {
           $extraParams .= "&qfKey=$qfKey";
         }
