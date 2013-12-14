@@ -4034,3 +4034,34 @@ span.crm-status-icon {
 .crm-container .survey-completed {
   text-decoration: line-through;
 }
+
+/*
+#crm-container .crm-star-rate-row {position:relative; margin:20px; overflow:hidden; zoom:1;}
+*/
+
+/* 'star-rating' component 
+#crm-container .crm-star-rate-row {position:relative; margin:4px; padding:4x; overflow:hidden; zoom:1;}
+#crm-container .crm-star-rate-row  ul {width:160px; margin:0; padding:0;}
+#crm-container .crm-star-rate-row  li {display:inline; list-style:none;}
+
+#crm-container .crm-star-rate-row  a, .crm-star-rate-row b {background:url("../i/star_rate.gif") left top repeat-x;}
+#crm-container .crm-star-rate-row  a {float:right; margin:0 80px 0 -144px; width:80px; height:16px; background-position:left 16px; color:#000; text-decoration:none;}
+#crm-container .crm-star-rate-row  a:hover {background-position:left -32px;}
+#crm-container .crm-star-rate-row  b {position:absolute; z-index:-1; width:80px; height:16px; background-position:left -16px;}
+#crm-container .crm-star-rate-row  div b {left:0px; bottom:0px; background-position:left top;}
+#crm-container .crm-star-rate-row  a span {position:absolute; left:-300px;}
+#crm-container .crm-star-rate-row  a:hover span {left:90px; width:100%;}
+*/
+
+
+/* 'star-rating' component */
+#crm-container .crm-star-rate-row {position:relative; margin:4px; overflow:hidden; zoom:1;}
+#crm-container .crm-star-rate-row ul {width:160px; margin:0; padding:0;}
+#crm-container .crm-star-rate-row li {display:inline; list-style:none;}
+#crm-container .crm-star-rate-row a, #crm-container .crm-star-rate-row b {background:url("../i/star_rate.gif") left top repeat-x;}
+#crm-container .crm-star-rate-row a {float:right; margin:0 80px 0 -144px; width:80px; height:16px; background-position:left 16px; color:#000; text-decoration:none;}
+#crm-container .crm-star-rate-row a:hover {background-position:left -32px;}
+#crm-container .crm-star-rate-row b {position:absolute; z-index:-1; width:80px; height:16px; background-position:left -16px;}
+#crm-container .crm-star-rate-row div b {left:0px; bottom:0px; background-position:left top;}
+#crm-container .crm-star-rate-row a span {position:absolute; left:-300px;}
+#crm-container .crm-star-rate-row a:hover span {left:90px; width:100%;}

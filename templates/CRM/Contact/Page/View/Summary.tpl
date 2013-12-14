@@ -130,6 +130,17 @@
     </div><!-- .crm-actions-ribbon -->
   {/if}
 
+    <div class="crm-star-rate-row">
+      <div>Currently rated: 3 stars<b></b></div>
+      <ul>
+	<li><a href="#"><span>Give it 5 stars</span></a></li>
+	<li><a href="#"><span>Give it 4 stars</span></a></li>
+	<li><a href="#"><span>Give it 3 stars</span><b></b></a></li>
+	<li><a href="#"><span>Give it 2 stars</span></a></li>
+	<li><a href="#"><span>Give it 1 star</span></a></li>
+      </ul>
+    </div>
+
   <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
     <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
       <ul class="crm-contact-tabs-list">
