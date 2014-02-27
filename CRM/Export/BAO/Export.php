@@ -318,6 +318,12 @@ class CRM_Export_BAO_Export {
 
       if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
+        if ($queryMode == CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+          // Following is not automatically populated because contribution search doesn't require them by default
+          $componentReturnProperties['contribution_soft_credit_name']   = 1;
+          $componentReturnProperties['contribution_soft_credit_amount'] = 1;
+          $componentReturnProperties['contribution_soft_credit_contribution_id']  = 1;
+        }
 
         $campaignReturnProperties = array();;
         foreach ($componentReturnProperties as $fld => $true) {

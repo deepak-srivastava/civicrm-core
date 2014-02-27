@@ -148,6 +148,12 @@
       </span>
   </td>
 </tr>
+<tr>
+  <td>
+    {$form.contribution_or_softcredits.label} <br />
+    {$form.contribution_or_softcredits.html}
+  </td>
+</tr>
 
 <tr>
   <td>
