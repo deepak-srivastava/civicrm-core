@@ -110,7 +110,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       ),
       TRUE
     );
-    $sel->setOptions(array($sel1, $sel2, $sel3));
+
+    $sel->setOptions(array($sel1, $sel2, $sel3, $col4));
 
     if (is_a($sel->_elements[1], 'HTML_QuickForm_select')) {
       // make second selector a multi-select -
@@ -122,6 +123,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       // make third selector a multi-select -
       $sel->_elements[2]->setMultiple(TRUE);
       $sel->_elements[2]->setSize(5);
+    }
+
+    if (!empty($col4) && is_a($sel->_elements[3], 'HTML_QuickForm_select')) {
+      // make forth selector a multi-select -
+      $sel->_elements[3]->setMultiple(TRUE);
+      $sel->_elements[3]->setSize(5);
     }
 
     //get the frequency units.
@@ -274,6 +281,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $defaults['entity'][0] = CRM_Utils_Array::value('mapping_id', $defaults);
       $defaults['entity'][1] = $entityValue;
       $defaults['entity'][2] = $entityStatus;
+      $defaults['entity'][3] = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+        CRM_Utils_Array::value('entity_filter', $defaults, '')
+      );
       if ($absoluteDate = CRM_Utils_Array::value('absolute_date', $defaults)) {
         list($date, $time) = CRM_Utils_Date::setDateDefaults($absoluteDate);
         $defaults['absolute_date'] = $date;
@@ -389,10 +399,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $params['mapping_id'] = $values['entity'][0];
     $entity_value = $values['entity'][1];
     $entity_status = $values['entity'][2];
+    $entity_filter = CRM_Utils_Array::value(3, $values['entity'], array());
 
     foreach (array(
-      'entity_value', 'entity_status') as $key) {
-      $params[$key] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $$key);
+      'entity_value', 'entity_status', 'entity_filter') as $key) {
+      if (!empty($$key)) {
+        $params[$key] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $$key);
+      }
     }
 
     $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);

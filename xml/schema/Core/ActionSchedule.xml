@@ -54,6 +54,13 @@
        <add>3.4</add>
   </field>
   <field>
+       <name>entity_filter</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Entity status</comment>
+       <add>4.3</add>
+  </field>
+  <field>
        <name>start_action_offset</name>
        <type>int unsigned</type>
        <comment>Reminder Interval.</comment>
