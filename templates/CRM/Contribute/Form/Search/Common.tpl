@@ -55,6 +55,12 @@
 </tr>
 <tr>
   <td>
+    {$form.contribution_or_softcredits.label} <br />
+    {$form.contribution_or_softcredits.html}
+  </td>
+</tr>
+<tr>
+  <td>
     <table style="width:auto">
       <tbody>
       <tr>
@@ -146,12 +152,6 @@
       <span class="crm-clear-link">
         (<a href="#" onclick="unselectRadio('contribution_pcp_display_in_roll','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
       </span>
-  </td>
-</tr>
-<tr>
-  <td>
-    {$form.contribution_or_softcredits.label} <br />
-    {$form.contribution_or_softcredits.html}
   </td>
 </tr>
 

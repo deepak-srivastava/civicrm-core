@@ -98,7 +98,10 @@ class CRM_Export_BAO_Export {
 
     switch ($exportMode) {
       case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
+        if (!CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
+          // apply group-by only when no soft credit columns are included
+          $groupBy = 'GROUP BY civicrm_contribution.id';
+        }
         break;
 
       case CRM_Export_Form_Select::EVENT_EXPORT:
