@@ -408,7 +408,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
 
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);
+    if ($this->_action & CRM_Core_Action::ADD) {
+      $params['is_active'] = 0;
+    } else {
+      $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);
+    }
     $params['is_repeat'] = CRM_Utils_Array::value('is_repeat', $values, 0);
 
     if (CRM_Utils_Array::value('is_repeat', $values) == 0) {

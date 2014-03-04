@@ -66,6 +66,13 @@ class CRM_Admin_Page_AJAX {
 
     if ($op == 'disable-enable') {
       $status = ts('Are you sure you want to enable this record?');
+
+      switch ($recordBAO) {
+        case 'CRM_Core_BAO_ActionSchedule':
+	  $count  = CRM_Core_BAO_ActionSchedule::getMailingsCount($recordID);
+	  $status = ts('Recipient(s) count for this reminder is "%1". If the count is unexpected it may send unintentional reminders. Are you sure want to enable this reminder?', array(1 => $count));
+	  break;
+      }
     }
     else {
       switch ($recordBAO) {
