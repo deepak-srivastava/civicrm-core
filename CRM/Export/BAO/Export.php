@@ -98,10 +98,7 @@ class CRM_Export_BAO_Export {
 
     switch ($exportMode) {
       case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        if (!CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
-          // apply group-by only when no soft credit columns are included
-          $groupBy = 'GROUP BY civicrm_contribution.id';
-        }
+        $queryMode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
         break;
 
       case CRM_Export_Form_Select::EVENT_EXPORT:
@@ -322,10 +319,11 @@ class CRM_Export_BAO_Export {
       if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
         if ($queryMode == CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
-          // Following is not automatically populated because contribution search doesn't require them by default
-          $componentReturnProperties['contribution_soft_credit_name']   = 1;
-          $componentReturnProperties['contribution_soft_credit_amount'] = 1;
-          $componentReturnProperties['contribution_soft_credit_contribution_id']  = 1;
+          // soft credit columns are not automatically populated, because contribution search doesn't require them by default
+          $componentReturnProperties = 
+            array_merge(
+              $componentReturnProperties, 
+              CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
         }
 
         $campaignReturnProperties = array();;
@@ -566,6 +564,16 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)
     ) {
       $groupBy = " GROUP BY contact_a.id";
+    }
+
+    switch ($exportMode) {
+      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
+        $groupBy = 'GROUP BY civicrm_contribution.id';
+        if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
+          // especial group by  when soft credit columns are included
+          $groupBy = 'GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.scredit_id';
+        }
+        break;
     }
 
     if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
