@@ -145,6 +145,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     foreach ($this->_freqUnits as $val => $label) {
       $freqUnitsDisplay[$val] = ts('%1(s)', array(1 => $label));
     }
+    $this->addElement('text', 'entity_source', ts('Source'));
 
     $this->addDate('absolute_date', ts('Start Date'), FALSE, array('formatType' => 'mailing'));
 
@@ -344,7 +345,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'subject',
       'absolute_date',
       'group_id',
-      'record_activity'
+      'record_activity',
+      'entity_source',
     );
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $values);

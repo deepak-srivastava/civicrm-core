@@ -964,6 +964,11 @@ WHERE sh.is_active=0 AND log.action_date_time IS NULL AND log.is_error=0 AND log
           $where[] = "e.{$mapping->entity_filter} IN ({$filter})";
         }
 
+	if ($actionSchedule->entity_source) {
+	    $esource = CRM_Utils_Type::escape($actionSchedule->entity_source, 'String');
+	    $where[] = "e.source = '{$esource}'";
+	}
+
         $dateField = str_replace('contribution_', 'e.', $actionSchedule->start_action_date);
       }
 

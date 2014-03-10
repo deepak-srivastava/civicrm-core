@@ -79,6 +79,11 @@
         <td>{$form.entity.html}</td>
     </tr>
 
+    <tr id="entitySource" class="crm-scheduleReminder-form-block-entity_source">
+      <td class="label">{$form.entity_source.label}</td>
+      <td>{$form.entity_source.html|crmAddClass:huge}</td>
+    </tr>
+
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
         <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong>{ts}OR{/ts}</strong><br /></td>
@@ -284,5 +289,15 @@
          );
      }
 
+  cj('#entity_0').change(function( ) {
+    var entity = cj("#entity_0 option:selected").val();
+    console.log(entityMapping[entity]);
+    if (entityMapping[entity] == 'civicrm_contribution') {
+      cj("#entitySource").show();
+    } else {
+      cj("#entity_source").val("");
+      cj("#entitySource").hide();
+    }
+  }).change();
  </script>
  {/literal}
