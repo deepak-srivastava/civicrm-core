@@ -211,7 +211,7 @@
               buildSelect("start_action_date");
         buildSelect("end_date");
         buildSelect1("recipient");
-         }){/literal}{if $action eq 1}.change(){/if}{literal};//make entity_3 not render for add action
+         });
      });
 
     cj(function() {
@@ -289,15 +289,24 @@
          );
      }
 
-  cj('#entity_0').change(function( ) {
+  cj(function() {
     var entity = cj("#entity_0 option:selected").val();
-    console.log(entityMapping[entity]);
-    if (entityMapping[entity] == 'civicrm_contribution') {
+    showHideEntitySource(entityMapping[entity]);
+    cj('#entity_0').change(function( ) {
+      entity = cj("#entity_0 option:selected").val();
+      showHideEntitySource(entityMapping[entity]);
+    });
+    if (cj('#entity_3')[0].length <= 0) {
+      cj('#entity_3').hide();
+    }
+  });
+  function showHideEntitySource(entity) {
+    if (entity == 'civicrm_contribution') {
       cj("#entitySource").show();
     } else {
       cj("#entity_source").val("");
       cj("#entitySource").hide();
     }
-  }).change();
- </script>
+  }
+</script>
  {/literal}
