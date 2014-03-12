@@ -128,6 +128,7 @@ function enableDisable( recordID, recordBAO, op, reloadPage, rowId ) {
     },
 
     open:function() {
+        cj( '#enableDisableStatusMsg' ).html( "In Progress.." ); // a temp message to avoid showing message from cache.
                    var postUrl = {/literal}"{crmURL p='civicrm/ajax/statusmsg' h=0 }"{literal};
             cj.post( postUrl, { recordID: recordID, recordBAO: recordBAO, op: op  }, function( statusMessage ) {
               if ( statusMessage.status ) {
