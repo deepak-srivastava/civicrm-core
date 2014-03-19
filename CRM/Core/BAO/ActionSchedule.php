@@ -621,20 +621,6 @@ WHERE   cas.entity_value = $id AND
       }
       $extraSelect = $extraJoin = $extraWhere = '';
 
-      if ($actionSchedule->record_activity) {
-        if ($mapping->entity == 'civicrm_membership') {
-          $activityTypeID =
-            CRM_Core_OptionGroup::getValue('activity_type', 'Membership Renewal Reminder', 'name');
-        }
-        else {
-          $activityTypeID =
-            CRM_Core_OptionGroup::getValue('activity_type', 'Reminder Sent', 'name');
-        }
-
-        $activityStatusID =
-          CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
-      }
-
       if ($mapping->entity == 'civicrm_activity') {
         $tokenEntity = 'activity';
         $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
@@ -723,6 +709,10 @@ WHERE sh.is_active=0 AND log.action_date_time IS NULL AND log.is_error=0 AND log
     $actionSchedule->is_active = 1;
     $actionSchedule->find(FALSE);
 
+    $mapping = new CRM_Core_DAO_ActionMapping();
+    $mapping->id = $mappingID;
+    $mapping->find(TRUE);
+
     $tokenFields = array();
     $session = CRM_Core_Session::singleton();
 
@@ -793,6 +783,16 @@ WHERE sh.is_active=0 AND log.action_date_time IS NULL AND log.is_error=0 AND log
 
         // insert activity log record if needed
         if ($actionSchedule->record_activity) {
+          if ($mapping->entity == 'civicrm_membership') {
+            $activityTypeID =
+              CRM_Core_OptionGroup::getValue('activity_type', 'Membership Renewal Reminder', 'name');
+          } else {
+            $activityTypeID =
+              CRM_Core_OptionGroup::getValue('activity_type', 'Reminder Sent', 'name');
+          }
+          $activityStatusID =
+            CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
+
           $activityParams = array(
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
