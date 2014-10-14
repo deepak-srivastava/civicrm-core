@@ -641,6 +641,7 @@ class CRM_Core_Resources {
 
       "js/Common.js",
       "js/crm.ajax.js",
+      "js/crmRecurringModeDialog.js",
     );
 
     // These scripts are only needed by back-office users

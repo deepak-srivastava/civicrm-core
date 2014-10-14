@@ -330,4 +330,20 @@
   {/if}
   </div>{* end of form block*}
 {/if} {* end of snippet if*}
-{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}
+
+{*just adds the dialog div*}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl"}
+
+{literal}
+<script type="text/javascript">
+CRM.$("#_qf_Activity_upload-top, #_qf_Activity_upload-bottom").crmRecurringModeDialog({
+  entityID    : '{/literal}{$entityID}{literal}',
+  entityTable : '{/literal}{$entityTable}{literal}',
+  mapper      : {
+    'CRM_Activity_Form_Activity': ''
+  }
+});
+</script>
+{/literal}
+
+{*include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"*}
