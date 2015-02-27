@@ -638,7 +638,7 @@ function civicrm_api3_contact_getquick($params) {
   }
   $from = implode(' ', $from);
   $limit = (int) CRM_Utils_Array::value('limit', $params);
-  $limit = $limit > 0 ? $limit : 10;
+  $limit = $limit > 0 ? $limit : 25;
 
   // add acl clause here
   list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
@@ -732,12 +732,12 @@ function civicrm_api3_contact_getquick($params) {
       if (!in_array('email', $list)) {
         $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";
       }
-      $whereClause = " WHERE ( email LIKE '$strSearch' OR sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
-      $exactWhereClause = " WHERE ( email LIKE '$name' OR sort_name LIKE '$name' $exactIncludeNickName ) {$where} ";
+      $whereClause = " WHERE ( email LIKE '$strSearch' OR display_name LIKE '$strSearch' $includeNickName ) {$where} ";
+      $exactWhereClause = " WHERE ( email LIKE '$name' OR display_name LIKE '$name' $exactIncludeNickName ) {$where} ";
     }
     else {
-      $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
-      $exactWhereClause = " WHERE ( sort_name LIKE '$name' $exactIncludeNickName ) {$where} ";
+      $whereClause = " WHERE ( display_name LIKE '$strSearch' $includeNickName ) {$where} ";
+      $exactWhereClause = " WHERE ( display_name LIKE '$name' $exactIncludeNickName ) {$where} ";
     }
   }
 

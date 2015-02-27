@@ -137,8 +137,10 @@ class CRM_Contact_Page_AJAX {
     $list = array_keys(CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_reference_options'
       ), '1');
-
-    $return = array_unique(array_merge(array('sort_name'), $list));
+    //MV:to get all information from custom Vcontact API 17/02/2015
+	// $return = array_unique(array_merge(array('sort_name'), $list));
+	$returnFields = array('sort_name', 'email', 'phone', 'street_address', 'city', 'postal_code', 'external_identifier');
+	$return = array_unique(array_merge($returnFields, $list));
 
     $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
 
@@ -174,8 +176,9 @@ class CRM_Contact_Page_AJAX {
     if (!empty($filterParams)) {
       $params = array_merge($params, $filterParams);
     }
-
-    $contact = civicrm_api('Contact', 'Get', $params);
+    //MV:modifed to Custom Vcontact API 17/02/2015
+	// $contact = civicrm_api('Contact', 'Get', $params);
+	$contact = civicrm_api('Vcontact', 'Get', $params);
 
     if (!empty($contact['is_error'])) {
       CRM_Utils_System::civiExit('error');
