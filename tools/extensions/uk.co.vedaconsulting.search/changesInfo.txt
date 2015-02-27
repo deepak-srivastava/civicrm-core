@@ -1,0 +1,33 @@
+Veda custom API
+================
+
+Custom Api Name (entity) : vcontact
+
+
+Permissions
+===========
+
+Copied the same permission of entity 'Contact' and Using 
+hook_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) 
+to set the 'vcontact' api permission.
+
+
+Core File changes
+=================
+
+1) CRM_Contact_Page_AJAX::contactReference()
+	--- set contact reference autocomplete field return values (Line no: 140 )
+	--- contact reference autocomplete field to use 'vcontact' instead 'contact' api  (Line no: 179)
+
+2) 	CRM_Core_Form::addEntityRef() 
+	--- to use Vcontat in REST , changed entity name from 'contact' to 'vconact' (line no: 1434)
+
+3) 	civicrm_api3_contact_getquick
+	--- changed limit '10' to '25' (line no: 643)
+	--- changed in whereclause, using 'display_name' instead of 'sort_name' (line no: 737, 738, 741, 742)
+
+
+UI changes 
+===========
+
+Enable wildcardNames in Admin >> Search preferences ( to serach all contact like %display_name% in getquick search ) 
