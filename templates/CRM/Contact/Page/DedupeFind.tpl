@@ -245,7 +245,7 @@ CRM.$(function($) {
     var sth = $('#dupePairs tbody tr');
     toggleDedupeSelect(sth, 1);
   });
-    
+  
   // inline search boxes placed in tfoot
   $('#dupePairsColFilters thead th').each( function () {
     var title = $('#dupePairs thead th').eq($(this).index()).text();
@@ -290,12 +290,22 @@ function toggleDedupeSelect(element, isMultiple) {
   }
   else {
     var id = [];
-    CRM.$(element).each(function() {
-      CRM.$(this).toggleClass('crm-row-selected');
-      var sth = CRM.$('input.crm-dedupe-select', this);
-      id.push(CRM.$(sth).prop('name').substr(5));
-    });
     var is_selected = CRM.$('.crm-dedupe-select-all').prop('checked') ? 1 : 0;
+    CRM.$(element).each(function() {
+      var hasClassSelected = CRM.$(this).hasClass('crm-row-selected');
+      if (is_selected) {
+        if (!hasClassSelected) {
+          CRM.$(this).addClass('crm-row-selected');
+        }
+      }
+      else{
+       CRM.$(this).removeClass('crm-row-selected'); 
+      }
+      var sth = CRM.$('input.crm-dedupe-select', this);
+      if (sth) {
+        id.push(CRM.$(sth).prop('name').substr(5));
+      }
+    });
   }
 
   var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
