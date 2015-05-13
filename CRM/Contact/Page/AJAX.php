@@ -694,6 +694,78 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_JSON::output(array('status' => ($status) ? $oper : $status));
   }
 
+  static function flipDedupeSelect() {
+    $pnids  = $_REQUEST['multipleId'];
+    $status = '';
+    // vertical flip 
+     if (is_array($pnids) && !CRM_Utils_Array::crmIsEmptyArray($pnids)) {
+      $pnids = implode(', ', $pnids);
+      $pnids = CRM_Utils_Type::escape($pnids, 'String');
+      $whereClause = " WHERE id IN ( {$pnids} ) ";
+      $query = "SELECT data, id, entity_id1, entity_id2  FROM civicrm_prevnext_cache";
+      $sql   = $query.$whereClause;
+      $dao   = CRM_Core_DAO::executeQuery($sql);
+      // Retreive all info related to preNextId
+      while ($dao->fetch()) {
+        $preNextIds[] = array('id' => $dao->id, 'data' => unserialize($dao->data), 'entity_id1' => $dao->entity_id1, 'entity_id2' => $dao->entity_id2);
+      }
+      
+      // flip contacts in data field
+      foreach ($preNextIds as $key => $value) {
+        $update[$value['id']] = array (
+          'dstID' => $value['data']['srcID'],
+          'dstName' => $value['data']['srcName'],
+          'srcID' => $value['data']['dstID'],
+          'srcName' => $value['data']['dstName'],
+          'weight' => $value['data']['weight'],
+          'canMerge' => $value['data']['canMerge']
+        );
+        
+      }
+      // update preNext row with fliped contact details
+      foreach ($preNextIds as $key => $value) {
+        $query = "
+          UPDATE `civicrm_prevnext_cache` cpc
+          SET cpc.`entity_id1` = %1, cpc.`entity_id2` = %2, cpc.data = %4
+          WHERE cpc.id = %3";
+        $queryParams = array(
+          1 => array( $value['entity_id2'], 'Int'),
+          2 => array( $value['entity_id1'], 'Int'),
+          3 => array( $value['id'], 'Int'),
+          4 => array(serialize($update[$value['id']]), 'String')
+        );
+        CRM_Core_DAO::executeQuery($query, $queryParams);
+      }
+      $status = "OK";
+    } else { // horizontal flip
+      $pnid  = CRM_Utils_Type::escape($_REQUEST['pnid'], 'Positive');
+      $srcId = CRM_Utils_Type::escape($_REQUEST['srcId'], 'Positive');
+      $dstId = CRM_Utils_Type::escape($_REQUEST['dstId'], 'Positive');
+      $data  = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_PrevNextCache', $pnid, 'data', 'id');
+      $data  = unserialize($data);
+      $update = array();
+      $update['dstID']    = $srcId;
+      $update['dstName']  = $data['srcName'];
+      $update['srcID']    = $dstId;
+      $update['srcName']  = $data['dstName'];
+      $update['weight']   = $data['weight'];
+      $update['canMerge'] = $data['canMerge'];
+      $query = "
+        UPDATE `civicrm_prevnext_cache` cpc
+        SET cpc.`entity_id1` = %1, cpc.`entity_id2` = %2, cpc.data = %4
+        WHERE cpc.id = %3";
+      $queryParams = array(
+        1 => array( $dstId, 'Int'),
+        2 => array( $srcId, 'Int'),
+        3 => array( $pnid, 'Int'),
+        4 => array(serialize($update), 'String')
+      );
+      CRM_Core_DAO::executeQuery($query, $queryParams);
+      $status = "OK";
+    }
+    
+    CRM_Utils_JSON::output(array('status' => $status));
+  }
   static function getDedupes() {
     $offset    = isset($_REQUEST['start']) ? CRM_Utils_Type::escape($_REQUEST['start'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['length']) ? CRM_Utils_Type::escape($_REQUEST['length'], 'Integer') : 25;
@@ -711,7 +783,7 @@ LIMIT {$offset}, {$rowCount}
 
     $cacheKeyString   = "merge {$contactType}_{$rgid}_{$gid}";
     $searchRows       = array();
-    $selectorElements = array('is_selected', 'is_selected_input', 'src_image', 'src', 'src_email', 'src_street', 'src_postcode', 'dst_image', 'dst', 'dst_email', 'dst_street', 'dst_postcode', 'conflicts', 'weight', 'actions');
+    $selectorElements = array('row_id', 'is_selected', 'is_selected_input', 'src_image', 'src', 'src_email', 'src_street', 'src_postcode', 'dst_image', 'dst', 'dst_email', 'dst_street', 'dst_postcode', 'conflicts', 'weight', 'actions');
 
     foreach ($_REQUEST['columns'] as $columnInfo) {
       if (!empty($columnInfo['search']['value'])) {
@@ -849,9 +921,11 @@ LIMIT {$offset}, {$rowCount}
         FALSE,
         $pair['dstID']
       );
+      $preNextId = $pairInfo['prevnext_id'];
       
+      $searchRows[$count]['row_id'] = $count;
       $searchRows[$count]['is_selected'] = $pairInfo['is_selected'];
-      $searchRows[$count]['is_selected_input'] = "<input type='checkbox' class='crm-dedupe-select' name='pnid_{$pairInfo['prevnext_id']}' value='{$pairInfo['is_selected']}' onclick='toggleDedupeSelect(this)'>";
+      $searchRows[$count]['is_selected_input'] = "<input type='checkbox' class='crm-dedupe-select' name='pnid_{$pairInfo['prevnext_id']}' value='{$pairInfo['is_selected']}'>";
       $searchRows[$count]['src_image'] = $srcTypeImage;
       $searchRows[$count]['src'] = CRM_Utils_System::href($pair['srcName'], 'civicrm/contact/view', "reset=1&cid={$pair['srcID']}");
       $searchRows[$count]['src_email'] = CRM_Utils_Array::value('src_email', $pairInfo);
@@ -870,8 +944,8 @@ LIMIT {$offset}, {$rowCount}
         if ($gid) {
           $mergeParams .= "&gid={$gid}";
         }
-
-        $searchRows[$count]['actions'] = CRM_Utils_System::href(ts('merge'), 'civicrm/contact/merge', $mergeParams);
+        $searchRows[$count]['actions']  = "<a id='flipDedupe' href='#' onClick=\"flipDedupeSelect( {$preNextId}, {$pair['srcID']}, {$pair['dstID']}, {$count}); return false;\">" . ts('flip') . "</a>&nbsp;|&nbsp;";
+        $searchRows[$count]['actions'] .= CRM_Utils_System::href(ts('merge'), 'civicrm/contact/merge', $mergeParams);
         $searchRows[$count]['actions'] .= "&nbsp;|&nbsp;<a id='notDuplicate' href='#' onClick=\"processDupes( {$pair['srcID']}, {$pair['dstID']}, 'dupe-nondupe', 'dupe-listing'); return false;\">" . ts('not a duplicate') . "</a>";
       }
       else {
