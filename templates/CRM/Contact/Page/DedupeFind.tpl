@@ -169,6 +169,7 @@
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`" a=1}{/capture}
    {/if}
    <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Batch Merge All Duplicates{/ts}</span></a>
+   <a href="#" title="{ts}Flip Selected Contacts{/ts}" onClick="flipAllSelected( );return false;" class="button"><span>{ts}Flip Selected Contacts{/ts}</span></a>
 
    {capture assign=backURL}{crmURL p="civicrm/contact/deduperules" q="reset=1" a=1}{/capture}
   <a href="{$backURL}" class="button crm-button-type-cancel"><span>{ts}Done{/ts}</span></a>
@@ -219,7 +220,15 @@ CRM.$(function($) {
         "visible": false
       }
     ],
+    "createdRow": function ( row, data, index ) {
+        $('td', row).eq(2).addClass('contact1');
+        $('td', row).eq(4).addClass('contact2');
+        $('td', row).eq(5).addClass('email1');
+        $('td', row).eq(6).addClass('email2');
+    },
     rowCallback: function (row, data) {
+      // set id to row
+      $(row).attr('id', data.row_id);
       // Set the checked state of the checkbox in the table
       $('input.crm-dedupe-select', row).prop('checked', data.is_selected == 1);
       if (data.is_selected == 1) {
@@ -324,6 +333,61 @@ function toggleDedupeSelect(element, isMultiple) {
   CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected}, function (data) {
     // nothing to do for now
   }, 'json');
+}
+// flip single row (Horizontal)
+function flipDedupeSelect(id, src, dst, rowid) {
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/flipDedupeSelect' h=0 q='snippet=4'}"{literal};
+  var request = CRM.$.post(dataUrl, {pnid: id, srcId: src, dstId: dst });
+  request.done(function(data) {
+    swapColumns(rowid);
+  });
+}
+// flip selected rows (Vertical)
+function flipAllSelected() {
+  var ids = [];
+  var rowids = [];
+  CRM.$('.crm-row-selected').each(function() {
+    var sth = CRM.$('input.crm-dedupe-select', this);
+    ids.push(CRM.$(sth).attr('name').substr(5));
+    rowids.push(CRM.$(this).attr('id'));
+  });
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/flipDedupeSelect' h=0 q='snippet=4'}"{literal};
+  var request = CRM.$.post(dataUrl, {multipleId: ids});
+  request.done(function(data) {
+    for (i = 0; i < rowids.length; i++) { 
+      swapColumns(rowids[i]);
+    }
+  });
+}
+
+function swapColumns(rowid) {
+  var table             = CRM.$('#dupePairs').DataTable();
+  var columnstreet      = table.column('7'); // street address column
+  var columnpostcode    = table.column('9'); // postcode column
+  var tmpcontact = CRM.$('tr#'+rowid+' td.contact1').html();
+  var tmpemail = CRM.$('tr#'+rowid+' td.email1').text();
+  CRM.$('tr#'+rowid+' td.contact1').html(CRM.$('tr#'+rowid+' td.contact2').html());
+  CRM.$('tr#'+rowid+' td.email1').text(CRM.$('tr#'+rowid+' td.email2').text());
+  CRM.$('tr#'+rowid+' td.contact2').html(tmpcontact);
+  CRM.$('tr#'+rowid+' td.email2').text(tmpemail);
+  if (columnstreet.visible() && columnpostcode.visible()) {
+    CRM.$('tr#'+rowid+' td:nth-child(8)').attr('class', 'streetadd1');
+    CRM.$('tr#'+rowid+' td:nth-child(9)').attr('class', 'streetadd2');
+    var tmpstreet = CRM.$('tr#'+rowid+' td.streetadd1').text();
+    CRM.$('tr#'+rowid+' td.streetadd1').text(CRM.$('tr#'+rowid+' td.streetadd2').text());
+    CRM.$('tr#'+rowid+' td.streetadd2').text(tmpstreet);
+    CRM.$('tr#'+rowid+' td:nth-child(10)').attr('class', 'postcode1');
+    CRM.$('tr#'+rowid+' td:nth-child(11)').attr('class', 'postcode2');
+    var tmppostcode = CRM.$('tr#'+rowid+' td.postcode1').text();
+    CRM.$('tr#'+rowid+' td.postcode1').text(CRM.$('tr#'+rowid+' td.postcode2').text());
+    CRM.$('tr#'+rowid+' td.postcode2').text(tmppostcode);
+  } else if (columnpostcode.visible() || columnstreet.visible() ){
+    CRM.$('tr#'+rowid+' td:nth-child(8)').attr('class', 'streetorpost1');
+    CRM.$('tr#'+rowid+' td:nth-child(9)').attr('class', 'streetorpost2');
+    var tmpstreetorpost = CRM.$('tr#'+rowid+' td.streetorpost1').text();
+    CRM.$('tr#'+rowid+' td.streetorpost1').text(CRM.$('tr#'+rowid+' td.streetorpost2').text());
+    CRM.$('tr#'+rowid+' td.streetorpost2').text(tmpstreetorpost);
+  }
 }
 </script>
 {/literal}
