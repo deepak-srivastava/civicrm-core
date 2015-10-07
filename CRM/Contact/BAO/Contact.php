@@ -40,6 +40,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * Note that this is also used by the 4.3 upgrade script.
    * @see CRM_Upgrade_Incremental_php_FourThree
    */
+  // sometinf fix 12344
   const DROP_STRIP_FUNCTION_43 = "DROP FUNCTION IF EXISTS civicrm_strip_non_numeric";
   const CREATE_STRIP_FUNCTION_43 = "
     CREATE FUNCTION civicrm_strip_non_numeric(input VARCHAR(255) CHARACTER SET utf8)
