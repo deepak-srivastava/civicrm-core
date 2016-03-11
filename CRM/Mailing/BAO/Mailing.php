@@ -1752,7 +1752,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
       // Populate the recipients.
       if (empty($params['_skip_evil_bao_auto_recipients_'])) {
-        self::getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, $mailing->dedupe_email);
+        $mode = $mailing->sms_provider_id ? "sms" : NULL;
+        self::getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, $mailing->dedupe_email, $mode);
       }
     }
 
