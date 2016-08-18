@@ -437,7 +437,10 @@ class CRM_Contact_BAO_Query {
     if ($fields) {
       $this->_fields = &$fields;
       $this->_search = FALSE;
-      $this->_skipPermission = TRUE;
+      // DS: fields are present for profile with fields of public / listing visibility.
+      // which skips permission / acl call by setting skipPermission to true.
+      // by commenting the following line we intend to do permissin check and use acl hooks
+      //$this->_skipPermission = TRUE;
     }
     else {
       $this->_fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE, TRUE);
