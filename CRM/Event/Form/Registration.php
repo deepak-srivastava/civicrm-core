@@ -120,7 +120,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @var array
    */
-  protected $_params;
+  public $_params;
 
   /**
    * The fields involved in this contribution page.
@@ -741,6 +741,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       $ids = array();
       $paymentPartcipant = CRM_Event_BAO_ParticipantPayment::create($paymentParams, $ids);
+
+      $pledgeId = $this->get('hack_pledge_id');
+      if ($pledgeId) {
+        CRM_Core_DAO::singleValueQuery("UPDATE civicrm_pledge set participant_id = %1 where id = %2", array(1 => array($participant->id, 'Integer'), 2 => array($pledgeId, 'Integer')));
+        CRM_Core_DAO::singleValueQuery("UPDATE civicrm_participant set status_id = 14 where id = %1", array(1 => array($participant->id, 'Integer')));
+      }
     }
 
     //set only primary participant's params for transfer checkout.

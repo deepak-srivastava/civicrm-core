@@ -49,7 +49,18 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
 
   public function browse() {
     $getTrxnInfo = $this->_context == 'transaction' ? TRUE : FALSE;
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, $getTrxnInfo, TRUE);
+
+    $isPledgeEvent = FALSE;
+    if ($this->_context == 'payment_info' && $this->_component == 'event') {
+      $sql = "SELECT id FROM civicrm_pledge WHERE participant_id = %1";
+      $isPledgeEvent = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($this->_id, 'Integer')));
+    }
+
+    if ($isPledgeEvent) {
+      $paymentInfo = self::getPledgePaymentInfo($this->_id, $this->_component);
+    } else {
+      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, $getTrxnInfo, TRUE);
+    }
     if ($this->_context == 'payment_info') {
       $this->assign('paymentInfo', $paymentInfo);
     }
@@ -71,6 +82,29 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
     }
 
     return parent::run();
+  }
+
+  static function getPledgePaymentInfo($id, $component) {
+    $info = array();
+
+    //fixme: also check status is completed
+    $sql = "SELECT SUM(pp.actual_amount) as paid
+      FROM civicrm_participant pa
+      INNER JOIN civicrm_pledge pl on pa.id = pl.participant_id
+      INNER JOIN civicrm_pledge_payment pp on pl.id = pp.pledge_id
+      WHERE participant_id = %1 and pp.status_id = 1";
+    $info['paid'] = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($id, 'Integer')));
+
+    $sql = "SELECT SUM(pp.scheduled_amount) as total
+      FROM civicrm_participant pa
+      INNER JOIN civicrm_pledge pl on pa.id = pl.participant_id
+      INNER JOIN civicrm_pledge_payment pp on pl.id = pp.pledge_id
+      WHERE participant_id = %1";
+    $info['total'] = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($id, 'Integer')));
+    $info['balance'] = $info['total'] - $info['paid'];
+    $info['transaction'] = array();
+
+    return $info;
   }
 
 }

@@ -94,6 +94,42 @@
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
     {/if}
+
+    {crmRegion name='event-main-pledge-block'}
+    {*if $pledgeBlock*}
+      {if $is_pledge_payment}
+      <div class="crm-public-form-item crm-section {$form.pledge_amount.name}-section">
+        <div class="label">{$form.pledge_amount.label}&nbsp;<span class="crm-marker">*</span></div>
+        <div class="content">{$form.pledge_amount.html}</div>
+        <div class="clear"></div>
+      </div>
+      {else}
+        <div class="crm-public-form-item crm-section {$form.is_pledge.name}-section">
+          <div class="label">&nbsp;</div>
+          <div class="content">
+            {$form.is_pledge.html}&nbsp;
+            {if $is_pledge_interval}
+              {$form.pledge_frequency_interval.html}&nbsp;
+            {/if}
+            {$form.pledge_frequency_unit.html}<span id="pledge_installments_num">&nbsp;{ts}for{/ts}&nbsp;{$form.pledge_installments.html}&nbsp;{ts}installments.{/ts}</span>
+          </div>
+          <div class="clear"></div>
+          {if $start_date_editable}
+            {if $is_date}
+              <div class="label">{$form.start_date.label}</div><div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
+            {else}
+              <div class="label">{$form.start_date.label}</div><div class="content">{$form.start_date.html}</div>
+            {/if}
+          {else}
+            <div class="label">{$form.start_date.label}</div>
+            <div class="content">{$start_date_display|date_format}</div>
+          {/if}
+        <div class="clear"></div>
+        </div>
+      {/if}
+    {*/if*}
+    {/crmRegion}
+
     {if $pcp && $is_honor_roll }
       <fieldset class="crm-public-form-item crm-group pcp-group">
         <div class="crm-public-form-item crm-section pcp-section">

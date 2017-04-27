@@ -1045,6 +1045,16 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
     }
 
+    //FIXME: add code to decide when isPledge is true / false. 2. pledgeID needed for triggers from reminder
+    $isPledge = TRUE;
+    $isEmailReceipt = TRUE;
+    if ($isPledge) {
+      $form = CRM_Contribute_Form_Contribution_Confirm::handlePledge($form, $params, $contribParams, $pledgeID, $contribution, $isEmailReceipt);
+      // fixme: to store pledge_id in params. Ideally params should be known at
+      // the time of creating participant-payment, so pledge could be updated as well. 
+      $form->set('hack_pledge_id', $form->_params['pledge_id']);
+    }
+
     $transaction->commit();
 
     return $contribution;

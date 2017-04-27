@@ -410,6 +410,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
+    $config = CRM_Core_Config::singleton();
+    if (in_array('CiviPledge', $config->enableComponents)) {// && !empty($this->_values['pledge_block_id'])) {
+      CRM_Pledge_BAO_PledgeBlock::buildPledgeBlock($this);
+    }
+
     //we have to load confirm contribution button in template
     //when multiple payment processor as the user
     //can toggle with payment processor selection
