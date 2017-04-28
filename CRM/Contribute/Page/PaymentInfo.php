@@ -88,11 +88,10 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
     $info = array();
 
     //fixme: also check status is completed
-    $sql = "SELECT SUM(pp.actual_amount) as paid
-      FROM civicrm_participant pa
-      INNER JOIN civicrm_pledge pl on pa.id = pl.participant_id
-      INNER JOIN civicrm_pledge_payment pp on pl.id = pp.pledge_id
-      WHERE participant_id = %1 and pp.status_id = 1";
+    $sql = "SELECT SUM(cc.total_amount) as paid
+      FROM civicrm_participant_payment pp
+      INNER JOIN civicrm_contribution cc on cc.id = pp.contribution_id
+      WHERE participant_id = %1 and cc.contribution_status_id = 1";
     $info['paid'] = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($id, 'Integer')));
 
     $sql = "SELECT SUM(pp.scheduled_amount) as total

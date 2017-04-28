@@ -1047,12 +1047,31 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     //FIXME: add code to decide when isPledge is true / false. 2. pledgeID needed for triggers from reminder
     $isPledge = TRUE;
-    $isEmailReceipt = TRUE;
+    $isEmailReceipt = FALSE; //since first payment of pledge is pending
     if ($isPledge) {
-      $form = CRM_Contribute_Form_Contribution_Confirm::handlePledge($form, $params, $contribParams, $pledgeID, $contribution, $isEmailReceipt);
-      // fixme: to store pledge_id in params. Ideally params should be known at
-      // the time of creating participant-payment, so pledge could be updated as well. 
-      $form->set('hack_pledge_id', $form->_params['pledge_id']);
+      // create a copy, so we can control params for handlePledge without
+      // modifying original contribution object
+      $dummyContribution = clone $contribution;
+      $totalWithoutInstallment = 0;
+      foreach ($form->_lineItem as $litems) {
+        foreach ($litems as  $litem) {
+          // -ve amount we assuming to be installment or discount to original 
+          if ($litem['line_total'] > 0) {
+            $totalWithoutInstallment += $litem['line_total']; 
+          }
+        }
+      }
+      $installmentAmount = $totalWithoutInstallment - $dummyContribution->total_amount;
+      $dummyContribution->total_amount = round(($installmentAmount / $params['pledge_installments']), 2);
+      //fixme: more validation on amount calculation is needed
+      if ($dummyContribution->total_amount > 0) { 
+        $dummyContribution->contribution_status_id = 2; //pending
+        $dummyContribution->id = NULL;
+        $form = CRM_Contribute_Form_Contribution_Confirm::handlePledge($form, $params, $contribParams, $pledgeID, $dummyContribution, $isEmailReceipt);
+        // fixme: to store pledge_id in params. Ideally params should be known at
+        // the time of creating participant-payment, so pledge could be updated as well. 
+        $form->set('hack_pledge_id', $form->_params['pledge_id']);
+      }
     }
 
     $transaction->commit();

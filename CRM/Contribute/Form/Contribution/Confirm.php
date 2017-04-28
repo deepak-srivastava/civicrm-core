@@ -97,10 +97,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       return $form;
     }
     else {
-      //when user creating pledge record.
       $pledgeParams = array();
       $pledgeParams['contact_id'] = $contribution->contact_id;
       $pledgeParams['installment_amount'] = $pledgeParams['actual_amount'] = $contribution->total_amount;
+      if ($contribution->contribution_status_id == 2) { // pending
+        $pledgeParams['actual_amount'] = NULL;
+      }
       $pledgeParams['contribution_id'] = $contribution->id;
       $pledgeParams['contribution_page_id'] = $contribution->contribution_page_id;
       $pledgeParams['financial_type_id'] = $contribution->financial_type_id;
@@ -129,6 +131,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //inherit campaign from contirb page.
       $pledgeParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $contributionParams);
 
+      CRM_Core_Error::debug_var('$pledgeParams', $pledgeParams);
       $pledge = CRM_Pledge_BAO_Pledge::create($pledgeParams);
 
       $form->_params['pledge_id'] = $pledge->id;

@@ -202,7 +202,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
         'scheduled_date',
         'scheduled_amount',
         'currency',
-        'pledge_start_date',
+        //'pledge_start_date',//fix for core fatal error
       );
       CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id',
         $form->_values['pledge_id'], $allPayments, $returnProperties
@@ -273,12 +273,21 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
     else {
 
       $pledgeBlock = self::getPledgeBlock($form->_id);
+      CRM_Core_Error::debug_var('get class $form', get_class($form));
 
-      // build form for pledge creation.
-      $pledgeOptions = array(
-        '0' => ts('I want to make a one-time contribution'),
-        '1' => ts('I pledge to contribute this amount every'),
-      );
+      if (get_class($form) == 'CRM_Event_Form_Registration_Register') {
+        // hooks is a better place
+        $pledgeOptions = array(
+          //'0' => ts('I want to make a one-time contribution'),
+          '1' => ts('I will pay remaining amount every'),
+        );
+      } else {
+        // build form for pledge creation.
+        $pledgeOptions = array(
+          '0' => ts('I want to make a one-time contribution'),
+          '1' => ts('I pledge to contribute this amount every'),
+        );
+      }
       $form->addRadio('is_pledge', ts('Pledge Frequency Interval'), $pledgeOptions,
         NULL, array('<br/>')
       );
