@@ -463,6 +463,29 @@ AND   cas.entity_value = $id AND
 
       //CRM-5734
       CRM_Utils_Hook::tokenValues($contact, $contactId);
+      // TOKEN implementation example
+      //function customaddress_civicrm_tokenValues( &$values, &$contactIDs, $job = null, $tokens = array(), $context = null) {
+      //  if (array_key_exists('reminder.reminder_id', $values)) {
+      //    Jun 02 12:43:40  [info] $$values = Array
+      //      [state_province_name] => NJ
+      //      [state_province] => NJ
+      //      [country] => United States
+      //      [reminder.reminder_id] => 1
+      //      [reminder.contact_id] => 87
+      //      [reminder.entity_id] => 631
+      //      [reminder.entity_table] => civicrm_activity
+      //      [activity.activity_id] => 631
+      //      [activity.activity_type] => Meeting
+      //      [activity.subject] => meet
+      //      [activity.details] => 
+      //      [activity.activity_date_time] => June 1st, 2017 10:12 PM
+      //
+      //    new custom token
+      //    $values['anything.custom'] = 'test working';
+      //  }
+      //  CRM_Core_Error::debug_var('$values in hook', $values);
+      //}
+
 
       CRM_Utils_Hook::tokens($hookTokens);
       $categories = array_keys($hookTokens);
@@ -828,6 +851,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
       while ($dao->fetch()) {
         $entityTokenParams = array();
+        // these values are going to appear in tokenValues hook, and can be used to populate other custom tokens
+        $entityTokenParams['reminder.reminder_id']  = $actionSchedule->id;
+        $entityTokenParams['reminder.contact_id']   = $dao->contactID;
+        $entityTokenParams['reminder.entity_id']    = $dao->entityID;
+        $entityTokenParams['reminder.entity_table'] = $dao->entityTable;
         foreach ($tokenFields as $field) {
           if ($field == 'location') {
             $loc = array();
