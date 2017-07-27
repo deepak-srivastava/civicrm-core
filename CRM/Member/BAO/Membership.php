@@ -1488,8 +1488,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       }
       // now go over the queue and create any available related memberships
       reset($queue);
-      while (($available > 0) && ($params = each($queue))) {
-        CRM_Member_BAO_Membership::create($params['value'], $relMemIds);
+      // DS: fix for https://civicrm.stackexchange.com/questions/7389/dedupe-errors-when-individuals-have-membership-by-relationship
+      while (($available > 0) && ($mparams = each($queue))) {
+        CRM_Member_BAO_Membership::create($mparams['value'], $relMemIds);
         $available--;
       }
     }
