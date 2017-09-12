@@ -154,17 +154,26 @@ class CRM_Core_Payment_Form {
       'is_required' => TRUE,
     );
 
+    $cvvRequired = 1;
+    if (in_array(get_class($form), array(
+      'CRM_Contribute_Form_Contribution',
+      'CRM_Event_Form_Participant',
+      'CRM_Member_Form_Membership'))
+    ) {
+      // Only backend pages to respect backoffice cvv setting
+      $cvvRequired = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
+        'cvv_backoffice_required',
+        NULL,
+        1
+      );
+    }
     $form->_paymentFields['cvv2'] = array(
       'htmlType' => 'text',
       'name' => 'cvv2',
       'title' => ts('Security Code'),
       'cc_field' => TRUE,
       'attributes' => array('size' => 5, 'maxlength' => 10, 'autocomplete' => 'off'),
-      'is_required' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-        'cvv_backoffice_required',
-        NULL
-        ,1
-      ),
+      'is_required' => $cvvRequired,
     );
 
     $form->_paymentFields['credit_card_exp_date'] = array(
