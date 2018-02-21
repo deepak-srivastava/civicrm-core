@@ -58,6 +58,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     // used for redirect back to contact summary
     $this->cid = CRM_Utils_Request::retrieve('cid', 'Integer');
 
+    global $dbLocale;
     $this->_logTables = array(
       'log_civicrm_contact' => array(
         'fk' => 'id',
@@ -100,7 +101,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         'bracket_info' => array(
           'entity_column' => 'group_id',
           'table' => 'log_civicrm_group',
-          'column' => 'title',
+          'column' => "title{$dbLocale}",
         ),
         'action_column' => 'status',
         'log_type' => 'Group',
@@ -119,7 +120,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         'bracket_info' => array(
           'entity_column' => 'relationship_type_id',
           'table' => 'log_civicrm_relationship_type',
-          'column' => 'label_a_b',
+          'column' => "label_a_b{$dbLocale}",
         ),
       ),
       'log_civicrm_activity_contact' => array(
@@ -370,7 +371,7 @@ SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']}
             'Timestamp',
           ),
           2 => array($id, 'Integer'),
-        ));
+        ), true, false);
       }
       else {
         $entityID = $id;
@@ -386,7 +387,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
         return CRM_Core_DAO::singleValueQuery($sql, array(
           1 => array(CRM_Utils_Date::isoToMysql($logDate), 'Timestamp'),
           2 => array($entityID, 'Integer'),
-        ));
+        ), true, false);
       }
       else {
         if (array_key_exists('options', $this->_logTables[$entity]['bracket_info']) &&

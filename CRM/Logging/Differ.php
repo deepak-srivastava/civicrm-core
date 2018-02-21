@@ -363,6 +363,7 @@ WHERE lt.log_conn_id = %1
   private function titlesAndValuesForCustomDataTable($table, $referenceDate) {
     $titles = array();
     $values = array();
+    global $dbLocale;
 
     $params = array(
       1 => array($this->log_conn_id, 'String'),
@@ -370,19 +371,19 @@ WHERE lt.log_conn_id = %1
       3 => array($table, 'String'),
     );
 
-    $sql = "SELECT id, title FROM `{$this->db}`.log_civicrm_custom_group WHERE log_date <= %2 AND table_name = %3 ORDER BY log_date DESC LIMIT 1";
-    $cgDao = CRM_Core_DAO::executeQuery($sql, $params);
+    $sql = "SELECT id, title{$dbLocale} FROM `{$this->db}`.log_civicrm_custom_group WHERE log_date <= %2 AND table_name = %3 ORDER BY log_date DESC LIMIT 1";
+    $cgDao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, NULL, FALSE, FALSE);
     $cgDao->fetch();
 
     $params[3] = array($cgDao->id, 'Integer');
     $sql = "
-SELECT column_name, data_type, label, name, option_group_id
+SELECT column_name, data_type, label{$dbLocale}, name, option_group_id
 FROM   `{$this->db}`.log_civicrm_custom_field
 WHERE  log_date <= %2
 AND    custom_group_id = %3
 ORDER BY log_date
 ";
-    $cfDao = CRM_Core_DAO::executeQuery($sql, $params);
+    $cfDao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, NULL, FALSE, FALSE);
 
     while ($cfDao->fetch()) {
       $titles[$cfDao->column_name] = "{$cgDao->title}: {$cfDao->label}";
@@ -397,13 +398,13 @@ ORDER BY log_date
           if (!empty($cfDao->option_group_id)) {
             $params[3] = array($cfDao->option_group_id, 'Integer');
             $sql = "
-SELECT   label, value
+SELECT   label{$dbLocale}, value
 FROM     `{$this->db}`.log_civicrm_option_value
 WHERE    log_date <= %2
 AND      option_group_id = %3
 ORDER BY log_date
 ";
-            $ovDao = CRM_Core_DAO::executeQuery($sql, $params);
+            $ovDao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, NULL, FALSE, FALSE);
             while ($ovDao->fetch()) {
               $values[$cfDao->column_name][$ovDao->value] = $ovDao->label;
             }
