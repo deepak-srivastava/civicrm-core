@@ -677,6 +677,16 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $tokens = CRM_Core_SelectValues::contactTokens();
     $tokens = array_merge(CRM_Core_SelectValues::activityTokens(), $tokens);
     $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
+
+    // expose event and participant custom fields as tokens {event.*}
+    $cTokens = array();
+    $eTokens = CRM_Utils_Token::getCustomFieldTokens('Event');
+    $eTokens = array_merge($eTokens, CRM_Utils_Token::getCustomFieldTokens('Participant'));
+    foreach($eTokens as $customKey => $title) {
+      $cTokens["{event.{$customKey}}"] = $title;
+    }
+
+    $tokens = array_merge($cTokens, $tokens);
     $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
     $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
     return $tokens;

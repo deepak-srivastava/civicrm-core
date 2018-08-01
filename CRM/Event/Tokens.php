@@ -61,7 +61,10 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'contact_phone' => ts('Event Contact (Phone)'),
         'balance' => ts('Event Balance'),
       ),
-      CRM_Utils_Token::getCustomFieldTokens('Event')
+      CRM_Utils_Token::getCustomFieldTokens('Event'),
+      // to make participant custom tokens work, and cause there is no participant entity, 
+      // expose participant tokens with event.*
+      CRM_Utils_Token::getCustomFieldTokens('Participant')
     ));
   }
 
@@ -143,7 +146,22 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $row->tokens($entity, $field, $actionSearchResult->$field);
     }
     elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
+      // schedule reminder entity is participant, even though its setup as event.
+      // here we make sure either custom sets (event or participant - both available as {event.*}), 
+      // gets parsed properly.
+      $entityId = $actionSearchResult->entity_id;
+      if ( $actionSearchResult->entity_table == 'civicrm_participant' ) {
+        $query = "select cg.extends 
+          from civicrm_custom_field cf 
+          join civicrm_custom_group cg on cg.id = cf.custom_group_id
+          where cf.id = %1";
+        $extends  = CRM_Core_DAO::singleValueQuery($query, array(1 => array($cfID, 'Integer')));
+        $entity   = strtolower($extends);
+        if ($entity == 'event') {
+          $entityId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $actionSearchResult->entity_id, 'event_id');
+        }
+      }
+      $row->customToken($entity, $cfID, $entityId);
     }
     else {
       $row->tokens($entity, $field, '');

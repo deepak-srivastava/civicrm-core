@@ -85,6 +85,9 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       }
 
       $contactArray = !is_array($contactId) ? array($contactId => $contact) : $contact;
+      // by passing actionSearchResult, in tokenValues hook we get more context and power
+      // to parse any new custom tokens.
+      $contactArray['actionSearchResult'] = $row->context['actionSearchResult'];
 
       // Note: This is a small contract change from the past; data should be missing
       // less randomly.

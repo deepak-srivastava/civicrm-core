@@ -146,6 +146,8 @@ class TokenRow {
       $fieldValue = \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
     }
 
+    // no participant entity, if it is, it's probably by event - CRM/Event/Tokens
+    $entity = ($entity == 'participant') ? 'event' : $entity;
     return $this->tokens($entity, $customFieldName, $fieldValue);
   }
 
